@@ -31,19 +31,18 @@ const contact = async (req, res) => {
 
 
 
-    // Send email using Resend
-    const response = await resend.emails.send({
-
-      // Resend testing sender
+    // Send Email using Resend
+    const emailResponse = await resend.emails.send({
       from: "Portfolio Contact <onboarding@resend.dev>",
 
-      // Your receiving email
-      to: "thakurprashantsingh077@gmail.com",
+      // Resend testing restriction:
+      // Only your Resend account email can receive emails
+      to: "nfxantaryami@gmail.com",
 
       subject: `New Portfolio Contact From ${name}`,
 
       text: `
-New Portfolio Contact
+New Portfolio Contact Received
 
 Name:
 ${name}
@@ -58,12 +57,11 @@ ${message}
 
 
 
-    // Debug log for Render
-    console.log("✅ Resend Response:", response);
+    console.log("✅ Resend Email Sent:", emailResponse);
 
 
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: "Thank you for reaching out! I'll get back to you soon.",
     });
@@ -84,7 +82,6 @@ ${message}
 
   }
 };
-
 
 
 module.exports = { contact };
