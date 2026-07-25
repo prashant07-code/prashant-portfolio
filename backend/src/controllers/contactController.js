@@ -2,9 +2,11 @@ const { Resend } = require("resend");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+
 const contact = async (req, res) => {
   try {
     const { name, email, message } = req.body;
+
 
     // Validation
     if (!name || !email || !message) {
@@ -13,11 +15,13 @@ const contact = async (req, res) => {
       });
     }
 
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({
         error: "Invalid email format."
       });
     }
+
 
     if (message.trim().length < 10) {
       return res.status(400).json({
@@ -26,20 +30,37 @@ const contact = async (req, res) => {
     }
 
 
-    // Send email using Resend
-    await resend.emails.send({
-      from: "Portfolio Contact <onboarding@resend.dev>",
-      to: "thakurprashantsingh077@gmail.com",
-      subject: `New Portfolio Contact From ${name}`,
-      text: `
-Name: ${name}
 
-Email: ${email}
+    // Send email using Resend
+    const response = await resend.emails.send({
+
+      // Resend testing sender
+      from: "Portfolio Contact <onboarding@resend.dev>",
+
+      // Your receiving email
+      to: "thakurprashantsingh077@gmail.com",
+
+      subject: `New Portfolio Contact From ${name}`,
+
+      text: `
+New Portfolio Contact
+
+Name:
+${name}
+
+Email:
+${email}
 
 Message:
 ${message}
       `,
     });
+
+
+
+    // Debug log for Render
+    console.log("✅ Resend Response:", response);
+
 
 
     return res.json({
@@ -48,14 +69,22 @@ ${message}
     });
 
 
+
   } catch (err) {
-    console.error("[ContactController] Error:", err.message);
+
+    console.error(
+      "❌ [ContactController] Error:",
+      err.message
+    );
+
 
     return res.status(500).json({
       error: "Failed to send message. Please try again."
     });
+
   }
 };
+
 
 
 module.exports = { contact };
