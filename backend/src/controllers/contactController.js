@@ -1,3 +1,5 @@
+const nodemailer = require("nodemailer");
+
 const contact = async (req, res) => {
   try {
     const { name, email, message } = req.body;
@@ -15,20 +17,44 @@ const contact = async (req, res) => {
       return res.status(400).json({ error: "Message must be at least 10 characters." });
     }
 
-    // TODO: Send email using nodemailer or similar
-    // For now, just log and respond
-    console.log(`📧 Contact Form Submission:\n Name: ${name}\n Email: ${email}\n Message: ${message}`);
 
-    // Simulate sending email (replace with actual email service)
-    // const mailSent = await sendEmail(email, name, message);
+    // Email transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+
+    // Send email
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER,
+      subject: `New Portfolio Contact From ${name}`,
+      text: `
+Name: ${name}
+
+Email: ${email}
+
+Message:
+${message}
+      `,
+    });
+
 
     return res.json({
       success: true,
       message: "Thank you for reaching out! I'll get back to you soon.",
     });
+
   } catch (err) {
     console.error("[ContactController] Error:", err.message);
-    return res.status(500).json({ error: "Failed to send message. Please try again." });
+
+    return res.status(500).json({
+      error: "Failed to send message. Please try again."
+    });
   }
 };
 
